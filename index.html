@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Sermon"><meta name="theme-color" content="#1F3864"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Sermon Navigator – Jesus Wept</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1c1b19;--mut:#6b675f;--card:#efece4;--acc:#1F3864;--mk:#ffe45c;--mkfg:#1c1b19;--fs:21px;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121316;--fg:#e9e7e2;--mut:#9c978d;--card:#1d1f25;--acc:#8EA9DB;--mk:#d9a700;--mkfg:#111}}
+:root[data-theme="dark"]{--bg:#121316;--fg:#e9e7e2;--mut:#9c978d;--card:#1d1f25;--acc:#8EA9DB;--mk:#d9a700;--mkfg:#111}
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 104px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:var(--fs)/1.6 Georgia,"Times New Roman",serif;padding-bottom:110px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+button,a{font-family:-apple-system,system-ui,"Segoe UI",sans-serif}
+#top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--card)}
+.r1{display:flex;align-items:center;gap:8px;padding:8px 10px}
+#cur{flex:1;font:600 14px/1.25 -apple-system,system-ui,sans-serif;color:var(--acc);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.b{border:0;background:var(--card);color:var(--fg);border-radius:12px;min-width:44px;height:44px;font-size:18px;font-weight:600}
+#clock{font-variant-numeric:tabular-nums;font-size:15px;min-width:74px}
+#clock.on{outline:2px solid var(--acc)}
+#chips{display:flex;gap:6px;overflow-x:auto;padding:0 10px 8px;-webkit-overflow-scrolling:touch}
+#chips a{flex:none;padding:8px 14px;border-radius:20px;background:var(--card);color:var(--fg);text-decoration:none;font-size:14px;font-weight:600}
+#chips a.on{background:var(--acc);color:var(--bg)}
+#prog{height:3px;background:var(--acc);width:0}
+main{max-width:720px;margin:0 auto;padding:6px 18px}
+section{scroll-margin-top:110px}
+[data-stop]{scroll-margin-top:calc(var(--hh,104px) + 6px)}
+h1{font:800 19px/1.3 -apple-system,system-ui,sans-serif;letter-spacing:.04em;color:var(--acc);margin:44px 0 14px;padding-top:18px;border-top:3px solid var(--acc)}
+section:first-child h1{margin-top:20px}
+h2{font:700 20px/1.35 -apple-system,system-ui,sans-serif;margin:32px 0 10px;color:var(--acc)}
+p{margin:0 0 .85em}
+mark{background:var(--mk);color:var(--mkfg);padding:1px 3px;border-radius:4px;font-weight:700;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.ref{font:700 13px/1.2 -apple-system,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);margin:22px 0 6px}
+blockquote{margin:0 0 1em;padding:12px 14px;background:var(--card);border-left:4px solid var(--acc);border-radius:0 10px 10px 0;font-style:italic}
+.pt{display:flex;gap:10px;margin:0 0 .5em;font-weight:700}
+.pt span{flex:none;width:28px;height:28px;border-radius:50%;background:var(--acc);color:var(--bg);font:700 14px/28px -apple-system,sans-serif;text-align:center;margin-top:4px}
+#bot{position:fixed;left:0;right:0;bottom:0;z-index:9;display:grid;grid-template-columns:1fr 64px 64px 1fr;gap:8px;padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--card)}
+#bot .b{height:52px;font-size:16px}
+#sheet{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.45);display:none}
+#sheet.o{display:block}
+#sh{position:absolute;left:0;right:0;bottom:0;max-height:82%;overflow:auto;background:var(--bg);border-radius:18px 18px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom,0px))}
+#sh .l{display:block;width:100%;text-align:left;border:0;background:none;color:var(--fg);padding:12px 8px;font-size:16px;border-bottom:1px solid var(--card)}
+#sh .l.h1{font-weight:800;color:var(--acc);margin-top:6px}
+#sh .l.h2{padding-left:24px;font-size:15px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tools .b{flex:1;font-size:14px;height:44px;padding:0 10px}
+.adlib{margin:-.3em 0 1.1em;padding:8px 12px;border-left:3px dashed var(--acc);font-size:.92em}
+.adlib::before{content:"AD-LIB";display:block;font:700 11px/1 -apple-system,system-ui,sans-serif;letter-spacing:.08em;color:var(--acc);margin-bottom:5px}
+</style></head><body>
+<header id="top">
+<div class="r1"><button class="b" id="menu" aria-label="Outline">☰</button><div id="cur">Jesus Wept · John 11:35</div><button class="b" id="clock">0:00</button></div>
+<nav id="chips"><a href="#s1">Intro</a><a href="#s2">Backstory</a><a href="#s3">Point I</a><a href="#s4">Point II</a><a href="#s5">Point III</a><a href="#s6">Conclusion</a></nav><div id="prog"></div>
+</header>
+<main>
+<section id="s0">
+<p><b>Text: John 11:35 (KJV)</b></p>
+<blockquote>“Jesus wept.”</blockquote>
+<p><b>Main Points:</b></p>
+<div class="pt"><span>1</span><b>When Tears Fall, Jesus Understands.</b></div>
+<div class="pt"><span>2</span><b>When Hearts Break, Jesus Cares.</b></div>
+<div class="pt"><span>3</span><b>When Hope Fades, Jesus Remains.</b></div>
+</section>
+<section id="s1"><h1 data-stop>INTRODUCTION</h1>
+<p>Good evening po sa ating lahat.</p>
+<p>Before we begin, I want to ask a simple question.</p>
+<p>Have you ever experienced a moment na gusto mong maging matatag, pero hindi mo na napigilan ang pagpatak ng luha mo?</p>
+<p>Minsan sinasabi natin sa sarili natin na, “Okay lang ako. Kaya ko pa.” Pero deep inside, pagod na pala tayo. Marami na pala tayong iniisip. Marami na pala tayong pinagdadaanan. At minsan, kahit gusto nating maging matatag, hindi na talaga natin mapigilan yung pag-iyak.</p>
+<p>Naniniwala akong lahat po tayo, anuman ang edad natin, ay may pinagdaanang ganito.</p>
+<p>Some of us have cried because of our family. Some because of sickness. Some because of losing someone we love. Some because of financial problems. And some, maybe, because of prayers na matagal na nating hinihintay or hindi na sunod ang ating panalangin.</p>
+<p><mark>you can believe in God’s promises and still have tears.</mark></p>
+<p>Kasi minsan, kapag nakikita natin ang isang Christiano na umiiyak, parang iniisip natin na mahina ang faith niya.</p>
+<p><mark>Pero mga kapatid, hindi naman po ibig sabihin na kapag umiiyak tayo, wala na tayong pananampalataya.</mark></p>
+<p>Sometimes, tears are simply part of being human. But always remember that being human is not a ticket for us to continue sin.</p>
+<p>But this evening, I want to tell you something that I pray will reach the deepest part of our hearts.</p>
+<p><mark>Jesus really cares for you.</mark></p>
+<p>Hindi lang Niya alam ang pinagdadaanan natin. Hindi lang Siya nakikinig sa mga dasal natin. Jesus cares. He truly, deeply cares.</p>
+<p>Hindi Siya Panginoong nakatayo sa malayo habang umiiyak tayo. Hindi Siya Panginoong naiinis sa kahinaan natin. Hindi Siya Panginoong napapagod sa saatin.</p>
+<p>Kapag pagod na tayo, nakikita Niya tayo. Kapag mag-isa tayo sa gabi at walang nakakaalam na umiiyak tayo, nandiyan Siya. <mark>Kapag pakiramdam natin ay nakalimutan na tayo ng lahat, hindi ka Niya nakalimutan.</mark></p>
+<p><mark>There is a Saviour who sees every tear, who feels every ache, and who loves you more than you will ever know.</mark></p>
+<p>And how do we know? Hindi lang dahil sinabi ng ibang tao. Hindi lang dahil narinig natin sa isang kanta. We know because the Bible shows us.</p>
+<p>And one of the clearest picture of that love is found in the shortest verse in the entire Bible.</p>
+<p>Two words.</p>
+<p>John 11:35.</p>
+<p>“Jesus wept.”</p>
+<p>Napakaikli. Pero church, don’t let its length fool you. <mark>Sometimes, the shortest words carry the heaviest meaning.</mark> Kapag sobrang bigat na ng nararamdaman ng isang tao, minsan hindi na siya makapagsalita nang mahaba. Ilang salita lang, o kahit luha na lang. Ganoon po ang verse na ito.</p>
+<p>Think about that. The God who holds the stars in His hands, the God who commands the wind and the waves, the God who has all power in heaven and in earth, stood in front of a crowd, and He wept. Hindi Siya nahiyang umiyak. Hindi Niya itinago ang luha Niya.</p>
+<p><mark>Because real love is not ashamed to feel.</mark></p>
+<p><mark>That is why I call this the shortest verse, but the deepest love.</mark></p>
+<p>And maybe, someone here this evening needs to hear this: <mark>if Jesus cried for Mary and Martha, He cares for you too.</mark></p>
+<p>At para po mas maunawaan natin kung bakit nga ba umiyak ang Panginoon, we need to go back to the story where it started.</p>
+</section>
+<section id="s2"><h1 data-stop>THE BACKSTORY: WHY DID JESUS WEEP?</h1>
+<p>Let’s go back to John chapter 11.</p>
+<h2 data-stop>A. A Friend Was Sick</h2>
+<p>Bethany was a small village near Jerusalem. And in Bethany lived a family that Jesus loved: Martha, Mary, and their brother Lazarus.</p>
+<p>They weren’t just a follower. They were friends.</p>
+<p>Then Lazarus became sick.</p>
+<div class="ref">John 11:3 (KJV)</div>
+<blockquote>“Therefore his sisters sent unto him, saying, Lord, behold, he whom thou lovest is sick.”</blockquote>
+<p class="adlib">Pansin niyo? Hindi nila sinabing “Lord, may sakit si Lazarus.” Ang sabi nila, “yung mahal Mo.” Kasi alam nilang mahal sila ni Jesus.</p>
+<p>Notice what the sisters said. They simply said, “he whom thou lovest.” They knew they only had to appeal to the love of Jesus.</p>
+<div class="ref">John 11:5 (KJV)</div>
+<blockquote>“Now Jesus loved Martha, and her sister, and Lazarus.”</blockquote>
+<p class="adlib">Isa-isa pa Niyang pinangalanan 'yan. Hindi sila basta crowd lang. Kilala sila ni Jesus, and He loved them.</p>
+<p><mark>Before the tears, there was love.</mark> Before the grave, there was friendship. <mark>Jesus was not a stranger standing outside their pain. He was a friend who was hurting with them.</mark></p>
+<h2 data-stop>B. The Delay That Hurt</h2>
+<p>When Jesus heard the news, He told His disciples that this sickness was for the glory of God (John 11:4).</p>
+<p>Pero tingnan natin ang sumunod na nangyari.</p>
+<div class="ref">John 11:6 (KJV)</div>
+<blockquote>“When he had heard therefore that he was sick, he abode two days still in the same place where he was.”</blockquote>
+<p class="adlib">Ang hirap intindihin dito, ‘di ba? Mahal Niya sila, pero hindi Siya agad pumunta. Pero church, may reason si Lord kahit hindi pa natin nakikita.</p>
+<p><mark>Jesus loved them, and yet He stayed two more days.</mark></p>
+<p>By the time Jesus came, he had already been in the grave four days (John 11:17).</p>
+<p>And listen to what Martha said.</p>
+<div class="ref">John 11:21 (KJV)</div>
+<blockquote>“Then said Martha unto Jesus, Lord, if thou hadst been here, my brother had not died.”</blockquote>
+<p class="adlib">Ito yung mga words na minsan nasasabi rin natin kay Lord. “Lord, bakit ngayon lang Kayo?” At okay lang ‘yun. Hindi Siya nagalit kay Martha.</p>
+<p>A few verses later, Mary said the very same words. “If only He had come. If only He was here.”</p>
+<p>Have you ever been there? <mark>Have you ever said, “Lord, if You had only been here”?</mark></p>
+<p><mark>And that is exactly the moment where Jesus wept.</mark></p>
+<h2 data-stop>C. Jesus Saw Their Tears</h2>
+<div class="ref">John 11:33 (KJV)</div>
+<blockquote>“When Jesus therefore saw her weeping, and the Jews also weeping which came with her, he groaned in the spirit, and was troubled,”</blockquote>
+<p class="adlib">Yung “groaned in the spirit,” ibig sabihin, bumigat din ang puso ni Jesus. Hindi Siya nanonood lang. Ramdam Niya yung sakit nila.</p>
+<p>Look at the heart of Jesus. He groaned in the spirit and was troubled. <mark>This was not a cold, distant sympathy. His heart was deeply moved.</mark></p>
+<p>Then Jesus asked a simple question: “Where have ye laid him?” They answered, “Lord, come and see.” And then came the shortest verse in the Bible: “Jesus wept.”</p>
+<p><mark>Hindi po nag madali ang Panginoon. Hindi Niya sinabi, “Tama na ang iyak.” He stood there, and He wept.</mark></p>
+<p><mark>in the middle of all the crying, the Son of God stood quietly, with tears rolling down His face.</mark></p>
+<h2 data-stop>D. So Why Did Jesus Weep?</h2>
+<p>After all, Jesus already knew that He would raise Lazarus. So why the tears?</p>
+<p><mark>Jesus did not cry because He had no solution.</mark></p>
+<p><mark>First, Jesus wept because He loved.</mark></p>
+<div class="ref">John 11:36 (KJV)</div>
+<blockquote>“Then said the Jews, Behold how he loved him!”</blockquote>
+<p class="adlib">Kahit yung mga taong nandoon, nakita nilang mahal ni Jesus si Lazarus. Kasi ang totoong love, nakikita.</p>
+<p>The tears said it all. Jesus loved Lazarus, and He was deeply moved by the sorrow of those around Him.</p>
+<p><mark>Second, Jesus wept because He felt their pain.</mark></p>
+<div class="ref">Romans 12:15 (KJV)</div>
+<blockquote>“Rejoice with them that do rejoice, and weep with them that weep.”</blockquote>
+<p class="adlib">Simple lang ‘yan. Masaya si kapatid, makisaya ka. Umiiyak siya, samahan mo. Minsan hindi na kailangan ng maraming sasabihin. Nandiyan ka lang, malaking bagay na.</p>
+<p><mark>Jesus did not just tell us to weep with those who weep. He showed it Himself.</mark> He stood with Mary and Martha in their sorrow, and He wept with them.</p>
+<p><mark>Church, this is the heart of our Lord. He is not distant from our pain.</mark> He knows our sorrow, and He cares.</p>
+<p><mark>And because of that, we can come to Jesus with every tear.</mark></p>
+<p>This morning, I want us to consider three things that those two words, “Jesus wept,” teach us.</p>
+</section>
+<section id="s3"><h1 data-stop>I. WHEN TEARS FALL, JESUS UNDERSTANDS</h1>
+<div class="ref">Hebrews 4:15 (KJV)</div>
+<blockquote>“For we have not an high priest which cannot be touched with the feeling of our infirmities; but was in all points tempted like as we are, yet without sin.”</blockquote>
+<p><mark>Church, one of the most comforting things about our Lord Jesus is this: He understands.</mark></p>
+<p>Minsan kasi, may mga bagay tayong pinagdadaanan na hindi natin kayang ipaliwanag. May mga sakit na mahirap ilagay sa salita, at may mga pagkakataon na kahit tayo mismo ay hindi maintindihan kung bakit ganoon kabigat ang ating nararamdaman.</p>
+<p>There are moments when we try to keep going, even when our hearts are already tired. We continue with our daily responsibilities, we do what needs to be done, and we try our best to remain strong. But deep inside, there are things that still hurt.</p>
+<p>And sometimes, we wonder if anyone truly understands what we are going through.</p>
+<p><mark>But church, I want you to remember this: Jesus understands.</mark></p>
+<p>Look at Hebrews 4:15.</p>
+<p>Sabi doon, mayroon tayong High Priest na nakadarama ng ating mga kahinaan.</p>
+<p>Ibig sabihin, hindi na bago sa Panginoon ang mga kahinaan natin.</p>
+<p><mark>Hindi Siya estranghero sa sakit natin.</mark></p>
+<p>He understands what it means to suffer. He understands rejection. He understands sorrow. He understands what it means to be misunderstood.</p>
+<p>Kaya kapag lumalapit tayo kay Jesus, hindi tayo lumalapit sa Panginoong walang alam sa pinagdadaanan natin.</p>
+<p>We are coming to a Saviour who understands.</p>
+<div class="ref">Isaiah 53:3 (KJV)</div>
+<blockquote>“He is despised and rejected of men; a man of sorrows, and acquainted with grief: and we hid as it were our faces from him; he was despised, and we esteemed him not.”</blockquote>
+<p>Jesus is called a Man of sorrows, acquainted with grief. Ibig sabihin, kilala Niya ang sakit. He has walked through it Himself.</p>
+<h2 data-stop>A. Jesus understands the tears that others cannot see.</h2>
+<p>Sometimes, the hardest tears to explain are the tears that nobody else sees.</p>
+<p>You can be surrounded by people and still feel alone. You can be smiling while carrying something heavy. You can be attending church, singing hymns, and listening to the preaching, while deep inside, there is something troubling your heart.</p>
+<p>And sometimes, we do not even know how to explain what we feel.</p>
+<p>But the wonderful truth is this:</p>
+<p><mark>You may not be able to explain your tears to other people, but you never have to explain them to Jesus.</mark></p>
+<p>In John 11, Jesus saw Mary weeping.</p>
+<p>He did not need her to explain every detail of her sorrow. He knew what was happening in her heart.</p>
+<p>And Hebrews 4:15 reminds us that our Lord is not a Saviour who is unfamiliar with our weaknesses.</p>
+<p>He understands.</p>
+<p>He understands the pain of losing someone. He understands the feeling of being rejected. He understands what it means to be misunderstood. He understands sorrow and suffering.</p>
+<p>When we come to Him, we are not coming to someone who has no idea what pain feels like.</p>
+<p><mark>We are coming to a Saviour who understands.</mark></p>
+<h2 data-stop>B. Jesus understands the tears of a weary heart.</h2>
+<p>Sometimes, we do not cry because of one particular problem.</p>
+<p>Sometimes, we cry because everything seems to come together at once.</p>
+<p>One problem after another. One responsibility after another. One disappointment after another.</p>
+<p>And there are moments when we simply become tired.</p>
+<p>Sa totoo lang, may mga pagkakataon din sa buhay ko na akala ko kaya ko pang harapin ang lahat.</p>
+<p>Akala ko, basta magsikap lang ako, basta gawin ko ang makakaya ko, magiging maayos na ang lahat.</p>
+<p>Pero napagtanto kong hindi pala lahat ng pagsubok ay nalulutas ng mas matinding pagsisikap.</p>
+<p>There are things that require patience.</p>
+<p>There are things that require prayer.</p>
+<p>At may mga bagay na nagpapaalala sa akin na kailangan ko talaga ang Panginoon.</p>
+<p>And maybe, some of us here have experienced the same thing.</p>
+<p>You have been strong for your family.</p>
+<p>You have been strong for your children.</p>
+<p>You have been strong for the people around you.</p>
+<p>Pero minsan, ikaw naman ang napapagod.</p>
+<p>And I want to remind you today:</p>
+<p><mark>Hindi mo kailangang magpanggap na okay ka sa harap ng Lord.</mark></p>
+<p>You can come to Him as you are.</p>
+<p>You can tell Him what hurts.</p>
+<p>You can tell Him what worries you.</p>
+<p>You can even come to Him with tears.</p>
+<p>Because the Lord understands.</p>
+<div class="ref">Hebrews 5:7 (KJV)</div>
+<blockquote>“Who in the days of his flesh, when he had offered up prayers and supplications with strong crying and tears unto him that was able to save him from death, and was heard in that he feared;”</blockquote>
+<p><mark>Even Jesus prayed with strong crying and tears.</mark> He knows what it is to pour out your heart to the Father.</p>
+<div class="ref">Closing Verse: Psalm 56:8 (KJV)</div>
+<blockquote>“Put thou my tears into thy bottle: are they not in thy book?”</blockquote>
+<p>Isn’t that beautiful?</p>
+<p><mark>Ang mga luhang hindi napapansin ng ibang tao, nakikita ng Diyos.</mark></p>
+<p><mark>Ang sakit na hindi natin kayang ipaliwanag, alam ng Diyos.</mark></p>
+<p><mark>Ang mga dasal na hindi natin masabi nang maayos, naiintindihan ng Diyos.</mark></p>
+<p><mark>Church, when tears fall, Jesus understands.</mark></p>
+<p>And that leads us to our second point.</p>
+</section>
+<section id="s4"><h1 data-stop>II. WHEN HEARTS BREAK, JESUS CARES</h1>
+<div class="ref">1 Peter 5:7 (KJV)</div>
+<blockquote>“Casting all your care upon him; for he careth for you.”</blockquote>
+<p>Now, there’s a difference between someone who understands your pain and someone who actually cares about your pain.</p>
+<p>And the wonderful truth is that Jesus does both.</p>
+<p><mark>He understands, and He cares.</mark></p>
+<p>Look again at John 11.</p>
+<p>When Jesus arrived at Bethany, He saw Mary weeping. He saw the people mourning. And He was deeply moved.</p>
+<p>Now, Jesus could have simply gone straight to the tomb.</p>
+<p>He could have focused only on the miracle.</p>
+<p>Pero bago pa lumabas si Lazarus sa libingan, nakatayo na si Jesus kasama ng mga nagdadalamhati.</p>
+<p>Why?</p>
+<p>Because Jesus was not only concerned about the miracle.</p>
+<p>He was also concerned about the people who were hurting.</p>
+<h2 data-stop>A. Jesus cares about what burdens our hearts.</h2>
+<p>Minsan, iniisip natin na baka masyadong maliit ang problema natin para dalhin sa Panginoon.</p>
+<p>Maybe we think:</p>
+<p>“Lord, marami Kang ibang ginagawa. Baka hindi naman ito mahalaga.”</p>
+<p>But look at 1 Peter 5:7.</p>
+<p>“Casting all your care upon him; for he careth for you.”</p>
+<p><mark>Notice the word ALL.</mark></p>
+<p>Hindi lang ang pinakamalalaking problema natin.</p>
+<p>Hindi lang ang mga emergency.</p>
+<p>Hindi lang ang mga bagay na sa tingin natin ay mahalaga.</p>
+<p><mark>ALL our cares.</mark></p>
+<p>Even the things that other people might consider small.</p>
+<p>Even the things that we cannot explain.</p>
+<p>Even the things that we have been carrying for a long time.</p>
+<p><mark>Because the Lord cares about you.</mark></p>
+<div class="ref">Matthew 11:28 (KJV)</div>
+<blockquote>“Come unto me, all ye that labour and are heavy laden, and I will give you rest.”</blockquote>
+<p><mark>He is not annoyed by your burdens. He is inviting you to bring them to Him.</mark></p>
+<h2 data-stop>B. Jesus cares even when His answer seems delayed.</h2>
+<p>Now, this is something interesting about the story of Lazarus.</p>
+<p>According to John 11:6, when Jesus heard that Lazarus was sick, He stayed two more days where He was.</p>
+<p>Imagine Mary and Martha.</p>
+<p>They knew Jesus could heal their brother.</p>
+<p>They sent word to Him.</p>
+<p>But Jesus did not arrive when they expected Him to.</p>
+<p>And when He finally came, Lazarus had already been dead for four days.</p>
+<p>Maybe some of us can relate to Mary and Martha.</p>
+<p>May mga panalangin tayong matagal nang hinihintay ang sagot.</p>
+<p>May mga bagay na hinihintay natin.</p>
+<p>May mga sitwasyong gusto nating baguhin ng Panginoon.</p>
+<p>At minsan, kapag matagal na, napapaisip tayo:</p>
+<p>“Lord, bakit hanggang ngayon?”</p>
+<p>“Lord, when will You answer?”</p>
+<p>“Lord, are You still listening?”</p>
+<p>But church, here’s something we need to remember:</p>
+<p><mark>The delay of God’s answer does not mean the absence of God’s care.</mark></p>
+<p><mark>Hindi porket hindi pa natin nakikita ang sagot, ibig sabihin ay nakalimutan na tayo ng Panginoon.</mark></p>
+<p>Hindi porket hindi pa nagbabago ang sitwasyon, ibig sabihin ay wala nang ginagawa ang Diyos.</p>
+<p>We may not understand His timing.</p>
+<p>We may not understand His ways.</p>
+<p><mark>But we can trust His heart.</mark></p>
+<div class="ref">Psalm 30:5 (KJV)</div>
+<blockquote>“For his anger endureth but a moment; in his favour is life: weeping may endure for a night, but joy cometh in the morning.”</blockquote>
+<p><mark>Mahaba man ang gabi mo, hindi iyon ang katapusan ng kuwento mo.</mark></p>
+<h2 data-stop>C. Jesus cares about the burdens we carry every day.</h2>
+<p>Church, not every burden is dramatic.</p>
+<p>Some burdens are ordinary, but they are heavy.</p>
+<p>A parent worrying about a child.</p>
+<p>A grandparent praying for the salvation of their family.</p>
+<p>A worker trying to provide for their household.</p>
+<p>A person quietly struggling with loneliness.</p>
+<p>And sometimes, the greatest burden is simply waking up every morning and trying to continue faithfully.</p>
+<p>But the Bible tells us that we can cast our cares upon Him.</p>
+<p>Not because we are strong enough to carry everything.</p>
+<p><mark>But because He cares enough to carry us.</mark></p>
+<div class="ref">Psalm 147:3 (KJV)</div>
+<blockquote>“He healeth the broken in heart, and bindeth up their wounds.”</blockquote>
+<p><mark>Notice that He does not ignore the wounds. He binds them up.</mark> Personal. Gentle. Caring.</p>
+<div class="ref">Closing Verse: Psalm 34:18 (KJV)</div>
+<blockquote>“The LORD is nigh unto them that are of a broken heart; and saveth such as be of a contrite spirit.”</blockquote>
+<p>I love that word: nigh.</p>
+<p><mark>The Lord is near.</mark></p>
+<p>Kapag wasak ang puso mo, the Lord is near.</p>
+<p>Kapag hindi mo alam kung saan ka magsisimula, the Lord is near.</p>
+<p>Kapag pakiramdam mo ay mag-isa ka, the Lord is near.</p>
+<p>And sometimes, the greatest comfort is not immediately seeing our problem disappear.</p>
+<p><mark>Sometimes, the greatest comfort is knowing that the Lord is near while we are going through it.</mark></p>
+<p>But church, the story does not end with Jesus weeping.</p>
+<p>He did not remain at the tomb.</p>
+<p>And that brings us to our last point.</p>
+</section>
+<section id="s5"><h1 data-stop>III. WHEN HOPE FADES, JESUS REMAINS</h1>
+<div class="ref">John 11:25 (KJV)</div>
+<blockquote>“Jesus said unto her, I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live:”</blockquote>
+<p>Now, this is where the story becomes even more powerful.</p>
+<p>When Jesus arrived at Bethany, Lazarus had already been dead for four days.</p>
+<p><mark>Sa tingin ng tao, wala nang pag-asa.</mark></p>
+<p>Martha even said in John 11:39:</p>
+<p>“Lord, by this time he stinketh: for he hath been dead four days.”</p>
+<p>In other words, Martha knew that Lazarus was already dead.</p>
+<p>She knew that the situation was beyond human help.</p>
+<p>But Jesus was not limited by what Martha could see.</p>
+<p>And sometimes, that’s exactly how we look at our own situations.</p>
+<p>We look at our problems and say:</p>
+<p>“Wala na akong magagawa.”</p>
+<p>“Hindi na ito magbabago.”</p>
+<p>“Parang wala nang pag-asa.”</p>
+<p>Maybe someone here has experienced that.</p>
+<p>Maybe you’ve prayed for a family member for so many years.</p>
+<p>Maybe you’ve been waiting for something to change.</p>
+<p>Maybe you’ve experienced disappointment after disappointment.</p>
+<p>And sometimes, it’s difficult to keep hoping when nothing seems to happen.</p>
+<p>But look at what Jesus said to Martha.</p>
+<p>“I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live.”</p>
+<p>He did not simply say, “I can give resurrection.”</p>
+<p><mark>He said, “I am the resurrection.”</mark></p>
+<p>Church, our hope is not simply in what Jesus can do.</p>
+<p><mark>Our hope is in who Jesus is.</mark></p>
+<p>Jesus did not only weep at the tomb. Listen to what happened next.</p>
+<div class="ref">John 11:43-44 (KJV)</div>
+<blockquote>“And when he thus had spoken, he cried with a loud voice, Lazarus, come forth. And he that was dead came forth, bound hand and foot with graveclothes: and his face was bound about with a napkin. Jesus saith unto them, Loose him, and let him go.”</blockquote>
+<p><mark>The same voice that trembled with sorrow thundered with power.</mark> The same eyes that shed tears saw life where everyone else saw death. <mark>Jesus wept, and then Jesus raised the dead.</mark></p>
+<h2 data-stop>A. Jesus remains even when we do not know what comes next.</h2>
+<p>There are moments in my life when I honestly don’t know what comes next.</p>
+<p>I have plans, but I do not know exactly how everything will happen.</p>
+<p>I have expectations, but I cannot guarantee that everything will happen according to my plans.</p>
+<p>And I think many of us can relate to that.</p>
+<p>Some of us are waiting for opportunities.</p>
+<p>Some are waiting for answers.</p>
+<p>Some are praying for their children.</p>
+<p>Some are worried about their health.</p>
+<p>Some are thinking about what the future holds.</p>
+<p>But here’s something I am learning:</p>
+<p><mark>Hindi ko kailangang malaman ang lahat tungkol sa bukas para magtiwala sa Diyos ngayon.</mark></p>
+<p>I don’t have to figure everything out before I trust Him.</p>
+<p>I don’t have to see the entire picture before I follow Him.</p>
+<p>And I believe that is true for all of us.</p>
+<p>Whether we are young or old, whether we are starting a new chapter or have already lived through many chapters of life, we still have things about tomorrow that we do not know.</p>
+<p>But we have a Saviour who remains faithful.</p>
+<h2 data-stop>B. Jesus remains our hope even in death.</h2>
+<p>Now, this is the greatest hope we have as Christians.</p>
+<p>Lazarus was raised from the dead, but eventually, Lazarus would die again.</p>
+<p>The miracle at Bethany was pointing to something greater.</p>
+<p>Jesus Himself would die on the cross.</p>
+<p>He would be buried.</p>
+<p>But on the third day, He would rise again.</p>
+<p>And because Jesus conquered death, those who believe in Him have a hope that goes beyond this life.</p>
+<p>Kaya kapag may pumanaw na mahal sa buhay na mananampalataya, yes, we grieve.</p>
+<p>Yes, we cry.</p>
+<p>Yes, we miss them.</p>
+<p><mark>But we do not grieve as those who have no hope.</mark></p>
+<div class="ref">1 Thessalonians 4:13 (KJV)</div>
+<blockquote>“But I would not have you to be ignorant, brethren, concerning them which are asleep, that ye sorrow not, even as others which have no hope.”</blockquote>
+<p>Paul did not say that we will never sorrow. He said that we do not sorrow as those who have no hope.</p>
+<p>Because our hope is not simply that everything will be okay in this world.</p>
+<p><mark>Our hope is that one day, we will be with the Lord.</mark></p>
+<p>Even the prophet Isaiah saw that day.</p>
+<div class="ref">Isaiah 25:8 (KJV)</div>
+<blockquote>“He will swallow up death in victory; and the Lord GOD will wipe away tears from off all faces; and the rebuke of his people shall he take away from off all the earth: for the LORD hath spoken it.”</blockquote>
+<p>And that is why Revelation 21:4 is such a wonderful promise.</p>
+<div class="ref">Closing Verse: Revelation 21:4 (KJV)</div>
+<blockquote>“And God shall wipe away all tears from their eyes; and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain: for the former things are passed away.”</blockquote>
+<p>Church, imagine that day.</p>
+<p>Wala nang ospital.</p>
+<p>Wala nang libing.</p>
+<p>Wala nang karamdaman.</p>
+<p>Wala nang kirot.</p>
+<p>Wala nang paalam.</p>
+<p>At wala nang luha.</p>
+<p>Not because we finally became strong enough.</p>
+<p>Not because we finally figured everything out.</p>
+<p><mark>But because God Himself will wipe away every tear from our eyes.</mark></p>
+<p><mark>And until that day comes, we have a Saviour who remains.</mark></p>
+<p><mark>When hope fades, Jesus remains.</mark></p>
+</section>
+<section id="s6"><h1 data-stop>CONCLUSION: THE SHORTEST VERSE, THE DEEPEST LOVE</h1>
+<p>Church, let’s go back to our main text.</p>
+<p>John 11:35.</p>
+<p>“Jesus wept.”</p>
+<p>Two words.</p>
+<p>Napakaikli ng talatang ito.</p>
+<p>Pero napakarami nitong ipinapaalala sa atin tungkol sa ating Panginoon.</p>
+<p><mark>It is the shortest verse in the Bible, but it carries the deepest love.</mark></p>
+<div class="ref">Romans 5:8 (KJV)</div>
+<blockquote>“But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.”</blockquote>
+<p>The same love that wept at the tomb of Lazarus went to the cross of Calvary. <mark>Jesus did not only cry for us. He died for us.</mark></p>
+<div class="ref">Romans 8:38-39 (KJV)</div>
+<blockquote>“For I am persuaded, that neither death, nor life, nor angels, nor principalities, nor powers, nor things present, nor things to come, Nor height, nor depth, nor any other creature, shall be able to separate us from the love of God, which is in Christ Jesus our Lord.”</blockquote>
+<p><mark>Nothing can separate you from that love.</mark> Not your tears. Not your weakness. Not even death.</p>
+<p>Today, we have learned three things:</p>
+<div class="pt"><span>1</span><b>When Tears Fall, Jesus Understands.</b></div>
+<div class="pt"><span>2</span><b>When Hearts Break, Jesus Cares.</b></div>
+<div class="pt"><span>3</span><b>When Hope Fades, Jesus Remains.</b></div>
+<p>And maybe, today, someone needs this reminder.</p>
+<p>Maybe you’ve been carrying something for a long time.</p>
+<p>Maybe you’ve been praying for your family.</p>
+<p>Maybe you’ve been asking the Lord for strength.</p>
+<p>Maybe you’re tired, but you keep going.</p>
+<p>Maybe you’re smiling in front of other people, pero sa loob-loob mo, may mabigat kang dinadala.</p>
+<p>And I want to remind you of this:</p>
+<p><mark>You don’t have to hide your tears from Jesus.</mark></p>
+<p>He already knows.</p>
+<p>He already understands.</p>
+<p>And He cares.</p>
+<p><mark>Church, never doubt this: Jesus really cares for you.</mark></p>
+<p>Honestly, I also have moments when I don’t have everything figured out.</p>
+<p>I still have uncertainties.</p>
+<p>I still have fears.</p>
+<p>I still have prayers that I am waiting for God to answer.</p>
+<p>But I am thankful that the God I serve is not a God who is distant from my struggles.</p>
+<p>He is not a God who tells me to figure everything out on my own.</p>
+<p>He is a God who understands.</p>
+<p>He is a God who cares.</p>
+<p>And He is a God who gives hope.</p>
+<p>And I believe that is true for everyone here.</p>
+<p>Whether you are 50, 60, 70, or 80 years old.</p>
+<p>Whether you are a parent, a grandparent, a student, or a young professional.</p>
+<p>We all need the same Saviour.</p>
+<p><mark>We all need Jesus.</mark></p>
+<p>So, when life becomes difficult, when the burdens become heavy, and when tears begin to fall, remember these words:</p>
+<p>“Jesus wept.”</p>
+<p><mark>When tears fall, Jesus understands.</mark></p>
+<p><mark>When hearts break, Jesus cares.</mark></p>
+<p><mark>And when hope fades, Jesus remains.</mark></p>
+<p>And one day, when we stand in the presence of our Lord, the promise of Revelation 21:4 will finally be fulfilled.</p>
+<p>There will be no more death.</p>
+<p>There will be no more sorrow.</p>
+<p>There will be no more crying.</p>
+<p>There will be no more pain.</p>
+<p>And there will be no more tears.</p>
+<p><mark>Until that day, church, may we continue to trust Him.</mark></p>
+<p>May we continue to walk with Him.</p>
+<p>And may we never forget:</p>
+<p><mark>The same Jesus who wept at the tomb of Lazarus is the same Jesus who conquered the grave.</mark></p>
+<p>Amen.</p>
+</section>
+</main>
+<nav id="bot"><button class="b" id="prev">◀ Prev</button><button class="b" id="fm">A−</button><button class="b" id="fp">A+</button><button class="b" id="next">Next ▶</button></nav>
+<div id="sheet"><div id="sh"><div class="tools"><button class="b" id="th">Light / Dark</button><button class="b" id="wl">Screen on: off</button><button class="b" id="rs">Reset timer</button></div><div id="ol"></div></div></div>
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)},R=document.documentElement;
+function S(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+var fs=+S('fs')||21,stops=[].slice.call(document.querySelectorAll('[data-stop]')),chips=[].slice.call(document.querySelectorAll('#chips a'));
+R.style.setProperty('--fs',fs+'px');if(S('th'))R.dataset.theme=S('th');
+function hh(){var h=$('#top').offsetHeight;R.style.setProperty('--hh',h+'px');R.style.scrollPaddingTop='calc(env(safe-area-inset-top,0px) + '+(h+6)+'px)';return h}
+function cur(){var y=hh()+24,i=0;stops.forEach(function(e,k){if(e.getBoundingClientRect().top<=y)i=k});return i}
+function go(i){i=Math.max(0,Math.min(stops.length-1,i));stops[i].scrollIntoView({behavior:'smooth'})}
+var tk=0;function upd(){tk=0;var i=cur(),e=stops[i];$('#cur').textContent=e.textContent;
+var d=document.documentElement,m=d.scrollHeight-innerHeight;$('#prog').style.width=(m>0?Math.min(100,scrollY/m*100):0)+'%';
+var sid=e.closest('section').id;chips.forEach(function(c){var on=c.getAttribute('href')==='#'+sid;c.classList.toggle('on',on);if(on&&c.dataset.s!==sid){chips.forEach(function(z){delete z.dataset.s});c.dataset.s=sid;c.scrollIntoView({inline:'center',block:'nearest'})}});S('pos',i)}
+addEventListener('scroll',function(){if(!tk)tk=requestAnimationFrame(upd)},{passive:true});addEventListener('resize',upd);
+$('#next').onclick=function(){go(cur()+1)};
+$('#prev').onclick=function(){var i=cur();go(stops[i].getBoundingClientRect().top<-hh()*0.2&&scrollY>0?i:i-1)};
+function setfs(d){fs=Math.max(15,Math.min(36,fs+d));R.style.setProperty('--fs',fs+'px');S('fs',fs)}
+$('#fm').onclick=function(){setfs(-2)};$('#fp').onclick=function(){setfs(2)};
+var ol=$('#ol');stops.forEach(function(e,i){var b=document.createElement('button');b.className='l '+e.tagName.toLowerCase();b.textContent=e.textContent;b.onclick=function(){$('#sheet').classList.remove('o');go(i)};ol.appendChild(b)});
+$('#menu').onclick=function(){$('#sheet').classList.add('o')};
+$('#sheet').onclick=function(e){if(e.target.id==='sheet')$('#sheet').classList.remove('o')};
+$('#th').onclick=function(){var d=R.dataset.theme?R.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;R.dataset.theme=d?'light':'dark';S('th',R.dataset.theme)};
+var t0=0,acc=+S('acc')||0,run=false,iv;function fmt(){var s=Math.floor((acc+(run?Date.now()-t0:0))/1000);$('#clock').textContent=Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
+$('#clock').onclick=function(){if(run){acc+=Date.now()-t0;run=false;clearInterval(iv)}else{t0=Date.now();run=true;iv=setInterval(fmt,500)}$('#clock').classList.toggle('on',run);S('acc',acc);fmt()};
+$('#rs').onclick=function(){acc=0;t0=Date.now();S('acc',0);fmt()};fmt();
+var lock=null,want=false;function ask(){if(!want||!navigator.wakeLock)return;navigator.wakeLock.request('screen').then(function(l){lock=l}).catch(function(){})}
+$('#wl').onclick=function(){want=!want;$('#wl').textContent='Screen on: '+(want?'on':'off');if(want)ask();else if(lock){lock.release();lock=null}};
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')ask()});
+hh();var p=+S('pos');if(p>0&&stops[p])setTimeout(function(){stops[p].scrollIntoView();upd()},60);else upd();
+try{if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}
+})();
+</script></body></html>
